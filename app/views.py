@@ -124,10 +124,8 @@ def translate():
         src_sentence = data['text']
 
         tgt_sentence = src_sentence
-        print(tgt_sentence)
         for step in loaded_models[model_id]['pipeline']:
             tgt_sentence = step(tgt_sentence)
-            print(tgt_sentence)
 
         out = {'text': src_sentence, 'translation':tgt_sentence}     
 

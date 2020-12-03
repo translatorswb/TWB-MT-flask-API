@@ -1,4 +1,4 @@
 Flask==1.1.2
 subword_nmt==0.3.6
-ctranslate2==1.15.0
+ctranslate2==1.16.2
 sacremoses==0.0.43

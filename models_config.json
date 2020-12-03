@@ -10,8 +10,22 @@
             "pipeline": {
                 "lowercase": true,
                 "tokenize": true,
+                "bpe": true,
+                "translate": true,
+                "recase": true
+            }
+        },
+	{
+            "src": "fr",
+            "tgt": "en",
+            "model_path": "fren-un",
+            "bpe_file": "",
+            "load": true,
+            "pipeline": {
+                "lowercase": true,
+                "tokenize": true,
                 "bpe": false,
-                "translate": false,
+                "translate": true,
                 "recase": true
             }
         }

@@ -1,0 +1,20 @@
+{
+    "models_root": "models",
+    "models": [
+        {
+            "src": "fr",
+            "tgt": "sw",
+            "model_path": "frsw",
+            "bpe_file": "BPE-mtedmix-6000.codes",
+            "load": true,
+            "pipeline": {
+                "lowercase": true,
+                "tokenize": true,
+                "bpe": false,
+                "translate": false,
+                "recase": true
+            }
+        }
+
+    ]
+}

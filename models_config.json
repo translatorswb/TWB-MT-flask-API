@@ -2,6 +2,18 @@
     "models_root": "models",
     "models": [
         {
+            "src": "xx",
+            "tgt": "xx",
+            "load": true,
+            "pipeline": {
+                "lowercase": false,
+                "tokenize": false,
+                "bpe": false,
+                "translate": false,
+                "recase": false
+            }
+        },
+        {
             "src": "fr",
             "tgt": "sw",
             "model_path": "frsw",
@@ -15,7 +27,7 @@
                 "recase": true
             }
         },
-	{
+       {
             "src": "fr",
             "tgt": "en",
             "model_path": "fren-un",

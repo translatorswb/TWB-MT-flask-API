@@ -135,7 +135,7 @@ def translate():
 
 @app.route('/reload', methods=['GET', 'POST'])
 def reload():
-    load_models(config_path)
+    load_models(CONFIG_FILE)
 
     return "Reloaded models\n"
 

@@ -4,6 +4,7 @@
         {
             "src": "xx",
             "tgt": "xx",
+            "model_path": "xxxx",
             "load": true,
             "pipeline": {
                 "lowercase": false,

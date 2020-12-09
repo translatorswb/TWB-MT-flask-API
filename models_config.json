@@ -16,7 +16,7 @@
         },
         {
             "src": "fr",
-            "tgt": "sw",
+            "tgt": "swc",
             "model_path": "frsw",
             "bpe_file": "BPE-mtedmix-6000.codes",
             "load": true,
@@ -28,6 +28,20 @@
                 "recase": true
             }
         },
+	{
+	    "src": "swc",
+	    "tgt": "fr",
+	    "model_path": "swfr",
+	    "bpe_file": "BPE-monomix-6000.codes",
+	    "load": true,
+	    "pipeline": {
+		"lowercase": true,
+		"tokenize": true,
+		"bpe": true,
+		"translate": true,
+		"recase": true
+	    }
+	},
        {
             "src": "fr",
             "tgt": "en",
@@ -41,7 +55,35 @@
                 "translate": true,
                 "recase": true
             }
-        }
+        },
+	{
+		"src": "ti",
+		"tgt": "en",
+		"model_path": "tien",
+		"bpe_file": "BPE-bigmix3a-6000.codes",
+		"load": true,
+		"pipeline": {
+			"lowercase": true,
+			"tokenize": true,
+			"bpe": true,
+			"translate": true,
+			"recase": true
+		}
+	},
+	{
+		"src": "ar-sy",
+		"tgt": "en",
+		"model_path": "levar-en",
+		"bpe_file": "levarmix.train.mtok.low.bpe-5000.codes",
+		"load": true,
+		"pipeline": {
+                        "lowercase": true,
+                        "tokenize": true,
+                        "bpe": true,
+                        "translate": true,
+                        "recase": true
+                }
+	}
 
     ]
 }

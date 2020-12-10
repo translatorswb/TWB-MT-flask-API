@@ -1,14 +1,24 @@
 from app import app
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_wtf import FlaskForm
+from flask_pagedown import PageDown
+from flask_pagedown.fields import PageDownField
+from wtforms.fields import SubmitField
 import re
 import os
 from subword_nmt import apply_bpe
-from ctranslate2 import Translator
+from ctranslate2 import translator   #COMMENT ON PC
 from sacremoses import MosesTokenizer, MosesDetokenizer
 import json
 
 #constants
 MOSES_TOKENIZER_DEFAULT_LANG = 'en'
+CONFIG_FILE = "models_config.json"
+# CONFIG_FILE = "models_config_mac.json"     #COMMENT OFF PC
+
+#GUI elements
+app.config['SECRET_KEY'] = 'secret!'
+pagedown = PageDown(app)
 
 #processors
 lowercaser =  lambda x: x.lower() #string IN -> string OUT
@@ -36,7 +46,7 @@ def get_segmenter(bpe_codes_path):
     segmenter = lambda x: bpe.process_line(x.strip()).split() #string IN -> list OUT
     return segmenter
 
-def get_translator(ctranslator_model_path):
+def get_translator(ctranslator_model_path):   #COMMENT ON PC
     ctranslator = Translator(ctranslator_model_path)
     translator = lambda x: ctranslator.translate_batch([x])[0][0]['tokens']  #list IN -> list OUT
     return translator
@@ -56,7 +66,7 @@ def load_models(config_path):
 
     for model_config in config_data['models']:
         if model_config['load']:
-            model_id = model_config['src'] + model_config['tgt']
+            model_id = model_config['src'] + "-" + model_config['tgt']
             loaded_models[model_id] = {}
             loaded_models[model_id]['src'] = model_config['src']
             loaded_models[model_id]['tgt'] = model_config['tgt']
@@ -83,7 +93,7 @@ def load_models(config_path):
 
             if 'translate' in model_config['pipeline'] and model_config['pipeline']['translate']:
                 print("translate", end=" ")
-                loaded_models[model_id]['pipeline'].append(get_translator(model_dir))
+                loaded_models[model_id]['pipeline'].append(get_translator(model_dir))   #COMMENT ON PC
             else:
             	loaded_models[model_id]['pipeline'].append(dummy_translator)
 
@@ -103,6 +113,21 @@ def load_models(config_path):
 
             print()
 
+def translate(src_lang, tgt_lang, text):
+    model_id = src_lang + "-" + tgt_lang
+    print(model_id)
+    print(loaded_models)
+
+    if model_id in loaded_models:
+
+        tgt_sentence = text
+        for step in loaded_models[model_id]['pipeline']:
+            tgt_sentence = step(tgt_sentence)
+
+        return tgt_sentence
+    else:
+        return 0
+
 def read_config(config_file):
     with open(config_file, "r") as jsonfile: 
         data = json.load(jsonfile) 
@@ -111,27 +136,17 @@ def read_config(config_file):
     return data
 
 @app.route('/translate', methods=['GET', 'POST'])
-def translate():
+def translate_api():
     data = request.get_json(force=True)
     
-    src_lang = data['src']
-    tgt_lang = data['tgt']
+    translation = translate(data['src'], data['tgt'], data['text'])
 
-    model_id = src_lang + tgt_lang
-
-    if model_id in loaded_models:
-
-        src_sentence = data['text']
-
-        tgt_sentence = src_sentence
-        for step in loaded_models[model_id]['pipeline']:
-            tgt_sentence = step(tgt_sentence)
-
-        out = {'text': src_sentence, 'translation':tgt_sentence}     
-
+    if translation:
+        out = {'text': data['text'], 'translation':translation}     
         return jsonify(out)  
     else:
-        return "No model named %s\n"%model_id
+        return "Language pair not supported %s\n"%(data['src'] + "-" + data['tgt'])
+
 
 @app.route('/reload', methods=['GET', 'POST'])
 def reload():
@@ -139,5 +154,32 @@ def reload():
 
     return "Reloaded models\n"
 
-CONFIG_FILE = "models_config.json"
+class PageDownFormExample(FlaskForm):
+    pagedown = PageDownField('Type the text you want to translate and click "Translate".')
+    submit = SubmitField('Translate')
+
+@app.route('/', methods=['GET', 'POST'])
+def gui():
+    form = PageDownFormExample()
+    language = "fr-swc" #Default
+    translated_text = ""
+    if form.validate_on_submit():
+        source = form.pagedown.data
+        language = str(request.form.get('lang'))
+
+        src_language = language.split("-")[0]
+        tgt_language = language.split("-")[1]
+
+        print("Request %s-%s"%(src_language, tgt_language))
+        print(source)
+
+        translated_text = translate(src_language, tgt_language, source)
+
+        if not translated_text:
+            translated_text = "Something went wrong"
+    else:
+        form.pagedown.data = ('This is a very simple test.')
+    return render_template('index.html', form=form, language=language, text=translated_text)
+
+
 load_models(CONFIG_FILE)

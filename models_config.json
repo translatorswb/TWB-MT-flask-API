@@ -71,7 +71,7 @@
 		}
 	},
 	{
-		"src": "ar-sy",
+		"src": "ar",
 		"tgt": "en",
 		"model_path": "levar-en",
 		"bpe_file": "levarmix.train.mtok.low.bpe-5000.codes",

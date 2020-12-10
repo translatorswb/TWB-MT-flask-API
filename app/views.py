@@ -7,7 +7,7 @@ from wtforms.fields import SubmitField
 import re
 import os
 from subword_nmt import apply_bpe
-from ctranslate2 import translator   #COMMENT ON PC
+from ctranslate2 import Translator   #COMMENT ON PC
 from sacremoses import MosesTokenizer, MosesDetokenizer
 import json
 

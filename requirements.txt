@@ -1,4 +1,8 @@
 Flask==1.1.2
+flask_wtf==0.14.2
+Flask-PageDown==0.3.0
+WTForms==2.3.3
+werkzeug==0.16.1
 subword_nmt==0.3.6
 ctranslate2==1.16.2
 sacremoses==0.0.43

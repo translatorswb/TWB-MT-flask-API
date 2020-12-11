@@ -43,12 +43,12 @@ body {
         <div style="text-align:center;">
         <label>Language</label>
         <select id="lang" name="lang">
-            <option value="fr-en">French - English</option>
-            <option value="swc-fr">Congolese Swahili - French</option>
-            <option value="fr-swc">French - Congolese Swahili</option>
-            <option value="ti-en">Tigrinya - English</option>
-            <option value="ar-en">Levantine Arabic - English</option>
-            <option value="xx-xx">Test</option>
+            <option value="fr-en" {% if language == "fr-en"%} selected {% endif %}>French - English</option>
+            <option value="swc-fr" {% if language == "swc-fr"%} selected {% endif %}>Congolese Swahili - French</option>
+            <option value="fr-swc" {% if language == "fr-swc"%} selected {% endif %}>French - Congolese Swahili</option>
+            <option value="ti-en" {% if language == "ti-en"%} selected {% endif %}>Tigrinya - English</option>
+            <option value="ar-en" {% if language == "ar-en"%} selected {% endif %}>Levantine Arabic - English</option>
+            <option value="xx-xx" {% if language == "xx-xx"%} selected {% endif %}>Test</option>
         </select>
 
 

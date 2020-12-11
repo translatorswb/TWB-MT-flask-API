@@ -14,6 +14,8 @@ import json
 
 #constants
 MOSES_TOKENIZER_DEFAULT_LANG = 'en'
+CTRANSLATE_INTER_THREADS = 16
+CTRANSLATE_DEVICE = 'cpu' #'cuda'
 CONFIG_FILE = "models_config.json"
 # CONFIG_FILE = "models_config_mac.json"     #COMMENT OFF PC
 
@@ -54,8 +56,8 @@ def get_ctranslator(ctranslator_model_path):   #COMMENT ON PC
     return translator
 
 def get_batch_ctranslator(ctranslator_model_path):   #COMMENT ON PC
-    ctranslator = Translator(ctranslator_model_path)
-    translator = lambda x: ctranslator.translate_batch(x)[0][0]['tokens']  #list IN -> list OUT
+    ctranslator = Translator(ctranslator_model_path, device=CTRANSLATE_DEVICE, inter_threads=CTRANSLATE_INTER_THREADS)
+    translator = lambda x: [s[0]['tokens'] for s in ctranslator.translate_batch(x)] 
     return translator
 
 def get_detokenizer(lang):
@@ -100,7 +102,7 @@ def load_models(config_path):
 
             if 'translate' in model_config['pipeline'] and model_config['pipeline']['translate']:
                 print("translate", end=" ")
-                loaded_models[model_id]['translator'] = get_batch_translator(model_dir)  #COMMENT ON PC
+                loaded_models[model_id]['translator'] = get_batch_ctranslator(model_dir)  #COMMENT ON PC
             else:
             	loaded_models[model_id]['translator'] = dummy_translator
 
@@ -135,11 +137,13 @@ def translate(src_lang, tgt_lang, text):
 
         #translate batch (ctranslate only)
         translated_sentence_batch = loaded_models[model_id]['translator'](sentence_batch)
+        print(translated_sentence_batch)
 
         #postprocess
         tgt_sentences = translated_sentence_batch
         for step in loaded_models[model_id]['postprocessors']:
             tgt_sentences = [step(s) for s in tgt_sentences]
+            print(tgt_sentences)
 
         tgt_text = " ".join(tgt_sentences)
 
@@ -157,7 +161,8 @@ def read_config(config_file):
 @app.route('/translate', methods=['GET', 'POST'])
 def translate_api():
     data = request.get_json(force=True)
-    
+    print("Request", data)
+
     translation = translate(data['src'], data['tgt'], data['text'])
 
     if translation:

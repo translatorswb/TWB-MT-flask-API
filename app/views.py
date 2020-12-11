@@ -9,6 +9,7 @@ import os
 from subword_nmt import apply_bpe
 from ctranslate2 import Translator   #COMMENT ON PC
 from sacremoses import MosesTokenizer, MosesDetokenizer
+from nltk.tokenize import sent_tokenize, word_tokenize
 import json
 
 #constants
@@ -21,6 +22,7 @@ app.config['SECRET_KEY'] = 'secret!'
 pagedown = PageDown(app)
 
 #processors
+sentence_segmenter = lambda x : sent_tokenize(x)   #string IN -> list OUT
 lowercaser =  lambda x: x.lower() #string IN -> string OUT
 desegmenter = lambda x: re.sub('(@@ )|(@@ ?$)', '', ' '.join(x)) #list IN -> string OUT
 capitalizer = lambda x: x.capitalize() #string IN -> string OUT
@@ -115,16 +117,19 @@ def load_models(config_path):
 
 def translate(src_lang, tgt_lang, text):
     model_id = src_lang + "-" + tgt_lang
-    print(model_id)
-    print(loaded_models)
 
     if model_id in loaded_models:
 
-        tgt_sentence = text
-        for step in loaded_models[model_id]['pipeline']:
-            tgt_sentence = step(tgt_sentence)
+        sentence_batch = sentence_segmenter(text)
+        tgt_text = ""
 
-        return tgt_sentence
+        for sentence in sentence_batch:
+            tgt_sentence = sentence
+            for step in loaded_models[model_id]['pipeline']:
+                tgt_sentence = step(tgt_sentence)
+            tgt_text += tgt_sentence + " "
+
+        return tgt_text.strip()
     else:
         return 0
 

@@ -48,9 +48,14 @@ def get_segmenter(bpe_codes_path):
     segmenter = lambda x: bpe.process_line(x.strip()).split() #string IN -> list OUT
     return segmenter
 
-def get_translator(ctranslator_model_path):   #COMMENT ON PC
+def get_ctranslator(ctranslator_model_path):   #COMMENT ON PC
     ctranslator = Translator(ctranslator_model_path)
     translator = lambda x: ctranslator.translate_batch([x])[0][0]['tokens']  #list IN -> list OUT
+    return translator
+
+def get_batch_ctranslator(ctranslator_model_path):   #COMMENT ON PC
+    ctranslator = Translator(ctranslator_model_path)
+    translator = lambda x: ctranslator.translate_batch(x)[0][0]['tokens']  #list IN -> list OUT
     return translator
 
 def get_detokenizer(lang):
@@ -78,40 +83,41 @@ def load_models(config_path):
             
             #Load model pipeline
             print("Pipeline:", end=" ")
-            loaded_models[model_id]['pipeline'] = []
+            loaded_models[model_id]['preprocessors'] = []
             if 'lowercase' in model_config['pipeline'] and model_config['pipeline']['lowercase']:
                 print("lowercase", end=" ")
-                loaded_models[model_id]['pipeline'].append(lowercaser)
+                loaded_models[model_id]['preprocessors'].append(lowercaser)
 
             if 'tokenize' in model_config['pipeline'] and model_config['pipeline']['tokenize']:
                 print("tokenize", end=" ")
-                loaded_models[model_id]['pipeline'].append(get_tokenizer(model_config['src']))
+                loaded_models[model_id]['preprocessors'].append(get_tokenizer(model_config['src']))
 
             if 'bpe' in model_config['pipeline'] and model_config['pipeline']['bpe']:
                 print("bpe", end=" ")
-                loaded_models[model_id]['pipeline'].append(get_segmenter(os.path.join(model_dir, model_config['bpe_file'])))
+                loaded_models[model_id]['preprocessors'].append(get_segmenter(os.path.join(model_dir, model_config['bpe_file'])))
             else:
-                loaded_models[model_id]['pipeline'].append(token_segmenter)
+                loaded_models[model_id]['preprocessors'].append(token_segmenter)
 
             if 'translate' in model_config['pipeline'] and model_config['pipeline']['translate']:
                 print("translate", end=" ")
-                loaded_models[model_id]['pipeline'].append(get_translator(model_dir))   #COMMENT ON PC
+                loaded_models[model_id]['translator'] = get_batch_translator(model_dir)  #COMMENT ON PC
             else:
-            	loaded_models[model_id]['pipeline'].append(dummy_translator)
+            	loaded_models[model_id]['translator'] = dummy_translator
 
+            loaded_models[model_id]['postprocessors'] = []
             if 'bpe' in model_config['pipeline'] and model_config['pipeline']['bpe']:
                 print("unbpe", end=" ")
-                loaded_models[model_id]['pipeline'].append(desegmenter)
+                loaded_models[model_id]['postprocessors'].append(desegmenter)
             else:
-                loaded_models[model_id]['pipeline'].append(token_desegmenter)
+                loaded_models[model_id]['postprocessors'].append(token_desegmenter)
 
             if 'tokenize' in model_config['pipeline'] and model_config['pipeline']['tokenize']:
                 print("detokenize", end=" ")
-                loaded_models[model_id]['pipeline'].append(get_detokenizer(model_config['tgt']))
+                loaded_models[model_id]['postprocessors'].append(get_detokenizer(model_config['tgt']))
 
             if 'recase' in model_config['pipeline'] and model_config['pipeline']['recase']:
                 print("racase", end=" ")
-                loaded_models[model_id]['pipeline'].append(capitalizer)
+                loaded_models[model_id]['postprocessors'].append(capitalizer)
 
             print()
 
@@ -121,15 +127,23 @@ def translate(src_lang, tgt_lang, text):
     if model_id in loaded_models:
 
         sentence_batch = sentence_segmenter(text)
-        tgt_text = ""
 
-        for sentence in sentence_batch:
-            tgt_sentence = sentence
-            for step in loaded_models[model_id]['pipeline']:
-                tgt_sentence = step(tgt_sentence)
-            tgt_text += tgt_sentence + " "
+        #preprocess
+        for step in loaded_models[model_id]['preprocessors']:
+            sentence_batch = [step(s) for s in sentence_batch]
+            print(sentence_batch)
 
-        return tgt_text.strip()
+        #translate batch (ctranslate only)
+        translated_sentence_batch = loaded_models[model_id]['translator'](sentence_batch)
+
+        #postprocess
+        tgt_sentences = translated_sentence_batch
+        for step in loaded_models[model_id]['postprocessors']:
+            tgt_sentences = [step(s) for s in tgt_sentences]
+
+        tgt_text = " ".join(tgt_sentences)
+
+        return tgt_text
     else:
         return 0
 

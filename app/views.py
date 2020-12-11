@@ -161,11 +161,10 @@ class PageDownFormExample(FlaskForm):
 @app.route('/', methods=['GET', 'POST'])
 def gui():
     form = PageDownFormExample()
-    language = "fr-swc" #Default
+    language = str(request.form.get('lang'))
     translated_text = ""
     if form.validate_on_submit():
         source = form.pagedown.data
-        language = str(request.form.get('lang'))
 
         src_language = language.split("-")[0]
         tgt_language = language.split("-")[1]
@@ -179,6 +178,8 @@ def gui():
             translated_text = "Something went wrong"
     else:
         form.pagedown.data = ('This is a very simple test.')
+
+    print("exit language", language)
     return render_template('index.html', form=form, language=language, text=translated_text)
 
 

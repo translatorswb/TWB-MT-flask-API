@@ -65,8 +65,9 @@
             }
         },
         {
-            "src": "fr2",
-            "tgt": "en2",
+            "src": "fr",
+            "tgt": "en",
+            "alt": "alt",
             "model_type": "opus",
             "model_path": null,
             "load": true,

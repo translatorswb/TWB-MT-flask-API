@@ -17,6 +17,7 @@ MOSES_TOKENIZER_DEFAULT_LANG = 'en'
 CTRANSLATE_INTER_THREADS = 16
 CTRANSLATE_DEVICE = 'cpu' #'cuda'
 CONFIG_FILE = "models_config.json"
+DEFAULT_MODEL_ID = "ctranslator2"
 # CONFIG_FILE = "models_config_mac.json"     #COMMENT OFF PC
 
 #GUI elements
@@ -34,6 +35,12 @@ dummy_translator = lambda x: x
 
 #models
 loaded_models = {}
+
+def get_model_id(src, tgt, alt_id=None):
+    model_id = src + "_" + tgt
+    if alt_id:
+        model_id += "_" + alt_id
+    return model_id
 
 def get_moses_tokenizer(lang):
     try:
@@ -105,7 +112,13 @@ def load_models(config_path):
 
     for model_config in config_data['models']:
         if model_config['load']:
-            model_id = model_config['src'] + "_" + model_config['tgt']
+
+            if 'alt' in model_config:
+                alt_id = model_config['alt']
+            else:
+                alt_id = None
+            
+            model_id = get_model_id(model_config['src'], model_config['tgt'], alt_id)
             loaded_models[model_id] = {}
             loaded_models[model_id]['src'] = model_config['src']
             loaded_models[model_id]['tgt'] = model_config['tgt']
@@ -165,9 +178,7 @@ def load_models(config_path):
 
             print()
 
-def translate(src_lang, tgt_lang, text):
-    model_id = src_lang + "_" + tgt_lang
-
+def translate(model_id, text):
     if model_id in loaded_models:
 
         if loaded_models[model_id]['sentence_segmenter']:
@@ -212,7 +223,9 @@ def translate_api():
     data = request.get_json(force=True)
     print("Request", data)
 
-    translation = translate(data['src'], data['tgt'], data['text'])
+    model_id = get_model_id(data['src'], data['tgt'])
+
+    translation = translate(model_id, data['text'])
 
     if translation:
         out = {'text': data['text'], 'translation':translation}     
@@ -239,13 +252,10 @@ def gui():
     if form.validate_on_submit():
         source = form.pagedown.data
 
-        src_language = language.split("_")[0]
-        tgt_language = language.split("_")[1]
-
-        print("Request %s-%s"%(src_language, tgt_language))
+        print("Request %s"%(language))
         print(source)
 
-        translated_text = translate(src_language, tgt_language, source)
+        translated_text = translate(language, source)
 
         if not translated_text:
             translated_text = "Something went wrong"

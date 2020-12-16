@@ -43,12 +43,13 @@ body {
         <div style="text-align:center;">
         <label>Language</label>
         <select id="lang" name="lang">
-            <option value="fr-en" {% if language == "fr-en"%} selected {% endif %}>French - English</option>
-            <option value="swc-fr" {% if language == "swc-fr"%} selected {% endif %}>Congolese Swahili - French</option>
-            <option value="fr-swc" {% if language == "fr-swc"%} selected {% endif %}>French - Congolese Swahili</option>
-            <option value="ti-en" {% if language == "ti-en"%} selected {% endif %}>Tigrinya - English</option>
-            <option value="ar-en" {% if language == "ar-en"%} selected {% endif %}>Levantine Arabic - English</option>
-            <option value="xx-xx" {% if language == "xx-xx"%} selected {% endif %}>Test</option>
+            <option value="fr_en" {% if language == "fr_en"%} selected {% endif %}>French - English</option>
+            <option value="swc_fr" {% if language == "swc_fr"%} selected {% endif %}>Congolese Swahili - French</option>
+            <option value="fr_swc" {% if language == "fr_swc"%} selected {% endif %}>French - Congolese Swahili</option>
+            <option value="ti_en" {% if language == "ti_en"%} selected {% endif %}>Tigrinya - English</option>
+	    <option value="en_ti" {% if language == "en_ti"%} selected {% endif %}>English - Tigrinya</option>
+            <option value="ar_en" {% if language == "ar_en"%} selected {% endif %}>Levantine Arabic - English</option>
+            <option value="xx_xx" {% if language == "xx_xx"%} selected {% endif %}>Test</option>
         </select>
 
 

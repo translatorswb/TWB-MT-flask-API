@@ -7,11 +7,11 @@
             "model_path": "xxxx",
             "load": true,
             "pipeline": {
-                "lowercase": false,
+                "lowercase": true,
                 "tokenize": false,
                 "bpe": false,
                 "translate": false,
-                "recase": false
+                "recase": true
             }
         },
         {
@@ -83,7 +83,22 @@
                         "translate": true,
                         "recase": true
                 }
-	}
+	},
+	{
+                "src": "en",
+		"tgt": "ti",
+		"model_path": "enti_adapt",
+		"bpe_file": "codes_file6000_en",
+		"load": true,
+		"pipeline": {
+                        "lowercase": true,
+			"tokenize": true,
+                        "bpe": true,
+			"translate": true,
+                        "recase": false
+                }
+        }
+		
 
     ]
 }

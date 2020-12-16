@@ -75,7 +75,7 @@ def load_models(config_path):
 
     for model_config in config_data['models']:
         if model_config['load']:
-            model_id = model_config['src'] + "-" + model_config['tgt']
+            model_id = model_config['src'] + "_" + model_config['tgt']
             loaded_models[model_id] = {}
             loaded_models[model_id]['src'] = model_config['src']
             loaded_models[model_id]['tgt'] = model_config['tgt']
@@ -124,7 +124,7 @@ def load_models(config_path):
             print()
 
 def translate(src_lang, tgt_lang, text):
-    model_id = src_lang + "-" + tgt_lang
+    model_id = src_lang + "_" + tgt_lang
 
     if model_id in loaded_models:
 
@@ -190,8 +190,8 @@ def gui():
     if form.validate_on_submit():
         source = form.pagedown.data
 
-        src_language = language.split("-")[0]
-        tgt_language = language.split("-")[1]
+        src_language = language.split("_")[0]
+        tgt_language = language.split("_")[1]
 
         print("Request %s-%s"%(src_language, tgt_language))
         print(source)

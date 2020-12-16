@@ -60,6 +60,15 @@ def get_batch_ctranslator(ctranslator_model_path):   #COMMENT ON PC
     translator = lambda x: [s[0]['tokens'] for s in ctranslator.translate_batch(x)] 
     return translator
 
+def get_batch_opustranslator(src, tgt):   
+    from transformers import MarianTokenizer, MarianMTModel
+    model_name = f'Helsinki-NLP/opus-mt-{src}-{tgt}'
+    tokenizer = MarianTokenizer.from_pretrained(model_name)
+    model = MarianMTModel.from_pretrained(model_name)
+
+    translator = lambda x: tokenizer.batch_decode(model.generate(**tokenizer.prepare_seq2seq_batch(src_texts=x, return_tensors="pt")), skip_special_tokens=True)
+    return translator
+
 def get_moses_detokenizer(lang):
     try:
         moses_detokenizer = MosesDetokenizer(lang=lang)
@@ -101,11 +110,7 @@ def load_models(config_path):
             loaded_models[model_id]['src'] = model_config['src']
             loaded_models[model_id]['tgt'] = model_config['tgt']
             
-            model_dir = os.path.join(config_data['models_root'], model_config['model_path'])
-            print(model_dir)
-
             #Load sentence segmenter
-            print(type(model_config['sentence_split']))
             if model_config['sentence_split'] == "nltk":
                 loaded_models[model_id]['sentence_segmenter'] = nltk_sentence_segmenter
             elif type(model_config['sentence_split']) == list:
@@ -126,13 +131,20 @@ def load_models(config_path):
 
             if 'bpe' in model_config['pipeline'] and model_config['pipeline']['bpe']:
                 print("bpe", end=" ")
+                model_dir = os.path.join(config_data['models_root'], model_config['model_path'])
                 loaded_models[model_id]['preprocessors'].append(get_bpe_segmenter(os.path.join(model_dir, model_config['bpe_file'])))
-            else:
+            elif model_config['model_type'] == 'ctranslator2':
                 loaded_models[model_id]['preprocessors'].append(token_segmenter)
 
             if 'translate' in model_config['pipeline'] and model_config['pipeline']['translate']:
                 print("translate", end=" ")
-                loaded_models[model_id]['translator'] = get_batch_ctranslator(model_dir)  #COMMENT ON PC
+                if model_config['model_type'] == 'ctranslator2':
+                    print("(ctranslator2)", end=" ")
+                    model_dir = os.path.join(config_data['models_root'], model_config['model_path'])
+                    loaded_models[model_id]['translator'] = get_batch_ctranslator(model_dir)  #COMMENT ON PC
+                elif model_config['model_type'] == 'opus':
+                    loaded_models[model_id]['translator'] = get_batch_opustranslator(loaded_models[model_id]['src'], loaded_models[model_id]['tgt'])
+                    print("(opus-huggingface)", end=" ")
             else:
             	loaded_models[model_id]['translator'] = dummy_translator
 
@@ -140,7 +152,7 @@ def load_models(config_path):
             if 'bpe' in model_config['pipeline'] and model_config['pipeline']['bpe']:
                 print("unbpe", end=" ")
                 loaded_models[model_id]['postprocessors'].append(desegmenter)
-            else:
+            elif model_config['model_type'] == 'ctranslator2':
                 loaded_models[model_id]['postprocessors'].append(token_desegmenter)
 
             if 'tokenize' in model_config['pipeline'] and model_config['pipeline']['tokenize']:
@@ -148,7 +160,7 @@ def load_models(config_path):
                 loaded_models[model_id]['postprocessors'].append(get_moses_detokenizer(model_config['tgt']))
 
             if 'recase' in model_config['pipeline'] and model_config['pipeline']['recase']:
-                print("racase", end=" ")
+                print("recase", end=" ")
                 loaded_models[model_id]['postprocessors'].append(capitalizer)
 
             print()
@@ -163,7 +175,10 @@ def translate(src_lang, tgt_lang, text):
         else:
             sentence_batch = [text]
 
+        print(sentence_batch)
+
         #preprocess
+        print("Preprocess")
         for step in loaded_models[model_id]['preprocessors']:
             sentence_batch = [step(s) for s in sentence_batch]
             print(sentence_batch)
@@ -173,6 +188,7 @@ def translate(src_lang, tgt_lang, text):
         print(translated_sentence_batch)
 
         #postprocess
+        print("Postprocess")
         tgt_sentences = translated_sentence_batch
         for step in loaded_models[model_id]['postprocessors']:
             tgt_sentences = [step(s) for s in tgt_sentences]

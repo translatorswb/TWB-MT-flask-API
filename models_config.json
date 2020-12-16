@@ -4,6 +4,7 @@
         {
             "src": "xx",
             "tgt": "xx",
+            "model_type": null,
             "model_path": "xxxx",
             "load": true,
             "sentence_split": null,
@@ -18,6 +19,7 @@
         {
             "src": "fr",
             "tgt": "swc",
+            "model_type": "ctranslator2",
             "model_path": "frsw",
             "bpe_file": "BPE-mtedmix-6000.codes",
             "load": true,
@@ -33,6 +35,7 @@
     	{
     	    "src": "swc",
     	    "tgt": "fr",
+            "model_type": "ctranslator2",
     	    "model_path": "swfr",
     	    "bpe_file": "BPE-monomix-6000.codes",
     	    "load": true,
@@ -48,6 +51,7 @@
        {
             "src": "fr",
             "tgt": "en",
+            "model_type": "ctranslator2",
             "model_path": "fren-un",
             "bpe_file": "",
             "load": true,
@@ -60,9 +64,23 @@
                 "recase": true
             }
         },
+        {
+            "src": "fr2",
+            "tgt": "en2",
+            "model_type": "opus",
+            "model_path": null,
+            "load": true,
+            "sentence_split": "nltk" ,
+            "pipeline": {
+                "lowercase": true,
+                "translate": true,
+                "recase": true
+            }
+        },
     	{
     		"src": "ti",
     		"tgt": "en",
+            "model_type": "ctranslator2",
     		"model_path": "tien",
     		"bpe_file": "BPE-bigmix3a-6000.codes",
     		"load": true,
@@ -78,6 +96,7 @@
     	{
     		"src": "ar",
     		"tgt": "en",
+            "model_type": "ctranslator2",
     		"model_path": "levar-en",
     		"bpe_file": "levarmix.train.mtok.low.bpe-5000.codes",
     		"load": true,
@@ -93,6 +112,7 @@
     	{
             "src": "en",
     		"tgt": "ti",
+            "model_type": "ctranslator2",
     		"model_path": "enti_adapt",
     		"bpe_file": "codes_file6000_en",
     		"load": true,

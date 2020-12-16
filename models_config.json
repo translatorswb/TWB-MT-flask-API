@@ -6,6 +6,7 @@
             "tgt": "xx",
             "model_path": "xxxx",
             "load": true,
+            "sentence_split": null,
             "pipeline": {
                 "lowercase": true,
                 "tokenize": false,
@@ -20,6 +21,7 @@
             "model_path": "frsw",
             "bpe_file": "BPE-mtedmix-6000.codes",
             "load": true,
+            "sentence_split": "nltk",
             "pipeline": {
                 "lowercase": true,
                 "tokenize": true,
@@ -28,26 +30,28 @@
                 "recase": true
             }
         },
-	{
-	    "src": "swc",
-	    "tgt": "fr",
-	    "model_path": "swfr",
-	    "bpe_file": "BPE-monomix-6000.codes",
-	    "load": true,
-	    "pipeline": {
-		"lowercase": true,
-		"tokenize": true,
-		"bpe": true,
-		"translate": true,
-		"recase": true
-	    }
-	},
+    	{
+    	    "src": "swc",
+    	    "tgt": "fr",
+    	    "model_path": "swfr",
+    	    "bpe_file": "BPE-monomix-6000.codes",
+    	    "load": true,
+            "sentence_split": "nltk",
+    	    "pipeline": {
+        		"lowercase": true,
+        		"tokenize": true,
+        		"bpe": true,
+        		"translate": true,
+        		"recase": true
+    	    }
+    	},
        {
             "src": "fr",
             "tgt": "en",
             "model_path": "fren-un",
             "bpe_file": "",
             "load": true,
+            "sentence_split": "nltk",
             "pipeline": {
                 "lowercase": true,
                 "tokenize": true,
@@ -56,49 +60,51 @@
                 "recase": true
             }
         },
-	{
-		"src": "ti",
-		"tgt": "en",
-		"model_path": "tien",
-		"bpe_file": "BPE-bigmix3a-6000.codes",
-		"load": true,
-		"pipeline": {
-			"lowercase": true,
-			"tokenize": true,
-			"bpe": true,
-			"translate": true,
-			"recase": true
-		}
-	},
-	{
-		"src": "ar",
-		"tgt": "en",
-		"model_path": "levar-en",
-		"bpe_file": "levarmix.train.mtok.low.bpe-5000.codes",
-		"load": true,
-		"pipeline": {
-                        "lowercase": true,
-                        "tokenize": true,
-                        "bpe": true,
-                        "translate": true,
-                        "recase": true
-                }
-	},
-	{
-                "src": "en",
-		"tgt": "ti",
-		"model_path": "enti_adapt",
-		"bpe_file": "codes_file6000_en",
-		"load": true,
-		"pipeline": {
-                        "lowercase": true,
-			"tokenize": true,
-                        "bpe": true,
-			"translate": true,
-                        "recase": false
-                }
+    	{
+    		"src": "ti",
+    		"tgt": "en",
+    		"model_path": "tien",
+    		"bpe_file": "BPE-bigmix3a-6000.codes",
+    		"load": true,
+            "sentence_split": [ "፧", "።", "፨", "?", "!", ":", "“", "”", "\"", "—", "-" ],
+    		"pipeline": {
+    			"lowercase": true,
+    			"tokenize": true,
+    			"bpe": true,
+    			"translate": true,
+    			"recase": true
+    		}
+    	},
+    	{
+    		"src": "ar",
+    		"tgt": "en",
+    		"model_path": "levar-en",
+    		"bpe_file": "levarmix.train.mtok.low.bpe-5000.codes",
+    		"load": true,
+            "sentence_split": "nltk",
+    		"pipeline": {
+                            "lowercase": true,
+                            "tokenize": true,
+                            "bpe": true,
+                            "translate": true,
+                            "recase": true
+                    }
+    	},
+    	{
+            "src": "en",
+    		"tgt": "ti",
+    		"model_path": "enti_adapt",
+    		"bpe_file": "codes_file6000_en",
+    		"load": true,
+            "sentence_split": "nltk",
+    		"pipeline": {
+                "lowercase": true,
+    			"tokenize": true,
+                "bpe": true,
+    			"translate": true,
+                "recase": false
+            }
         }
-		
 
     ]
 }
